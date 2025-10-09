@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersResolver } from './users/users.resolver';
 import { UsersModule } from './users/users.module';
 import { GendersModule } from './genders/genders.module';
 import { ProductsModule } from './products/products.module';
@@ -17,14 +16,79 @@ import { CategoriesModule } from './categories/categories.module';
 import { UsersRolesModule } from './users-roles/users-roles.module';
 import { CustomersModule } from './customers/customers.module';
 import { CategoriesKindModule } from './categories-kind/categories-kind.module';
-import { OrdersModule } from './orders/orders.module';
-import { CountriesModule } from './countries/countries.module';
-import { OrderDetailsModule } from './order-details/order-details.module';
-import { RolesModule } from './roles/roles.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from './users/entities/user.entity';
+import { Product } from './products/entities/product.entity';
+import { Manufacture } from './manufactures/entities/manufacture.entity';
+import { ProductsSize } from './products-sizes/entities/products-size.entity';
+import { ProductsImage } from './products-images/entities/products-image.entity';
+import { Gender } from './genders/entities/gender.entity';
+import { ConfigModule } from '@nestjs/config';
+import { Color } from './colors/entities/color.entity';
+import { ProductsColor } from './products-colors/entities/products-color.entity';
+import { Country } from './countries/entities/country.entity';
+import { UsersRole } from './users-roles/entities/users-role.entity';
+import { Size } from './sizes/entities/size.entity';
+import { OrderDetail } from './order-details/entities/order-detail.entity';
+import { ShoppingCart } from './shopping-cart/entities/shopping-cart.entity';
+import { Role } from './roles/entities/role.entity';
+import { Order } from './orders/entities/order.entity';
+import { Category } from './categories/entities/category.entity';
+import { CategoriesKind } from './categories-kind/entities/categories-kind.entity';
+import { Customer } from './customers/entities/customer.entity';
 
 @Module({
-  imports: [UsersModule, GendersModule, ProductsModule, ProductsColorsModule, ProductsImagesModule, ProductsSizesModule, SizesModule, ColorsModule, ManufacturesModule, ShoppingCartModule, OrdersDetailsModule, CategoriesModule, UsersRolesModule, CustomersModule, CategoriesKindModule, OrdersModule, CountriesModule, OrderDetailsModule, RolesModule],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true, // ⚡ hace que esté disponible en todo el proyecto
+    }),
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: process.env.DB_HOST,
+      port: Number(process.env.DB_PORT),
+      username: process.env.DB_USER,
+      password: process.env.DB_PASS,
+      database: process.env.DB_NAME,
+      entities: [
+        User,
+        Product,
+        Manufacture,
+        ProductsSize,
+        ProductsImage,
+        Color,
+        ProductsColor,
+        Gender,
+        Country,
+        UsersRole,
+        Size,
+        OrderDetail,
+        ShoppingCart,
+        Role,
+        Order,
+        Category,
+        Customer,
+        CategoriesKind,
+      ],
+      synchronize: false, // Solo en desarrollo
+      autoLoadEntities: true,
+    }),
+    UsersModule,
+    GendersModule,
+    ProductsModule,
+    ProductsColorsModule,
+    ProductsImagesModule,
+    ProductsSizesModule,
+    SizesModule,
+    ColorsModule,
+    ManufacturesModule,
+    ShoppingCartModule,
+    OrdersDetailsModule,
+    CategoriesModule,
+    UsersRolesModule,
+    CustomersModule,
+    CategoriesKindModule,
+  ],
   controllers: [AppController],
-  providers: [AppService, UsersResolver],
+  providers: [AppService],
 })
 export class AppModule {}

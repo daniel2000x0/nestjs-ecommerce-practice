@@ -9,9 +9,21 @@ export class Country {
   @Column()
   countryid: number;
 
-  @PrimaryGeneratedColumn('uuid')
+  @Column({ type: 'uuid', unique: true })
   countrycode: string;
 
-  @OneToMany(() => Order, (order) => order.customerId)
+  @Column({ length: 2 })
+  countrycodealpha2: string;
+
+  @Column({ length: 3 })
+  countrycodealpha3: string;
+
+  @Column()
+  countrynameen: string;
+
+  @Column()
+  countrynamear: string;
+
+  @OneToMany(() => Order, (order) => order.customercountry)
   orders: Order[];
 }

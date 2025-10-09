@@ -6,9 +6,11 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Unique,
 } from 'typeorm';
 
 @Entity('orders')
+@Unique(['orderid'])
 export class Order {
   @PrimaryGeneratedColumn()
   serial: number;

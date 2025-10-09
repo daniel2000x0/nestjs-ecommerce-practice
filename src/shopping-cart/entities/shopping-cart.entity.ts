@@ -9,7 +9,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-@Entity('shopping')
+@Entity('shopping_cart')
 export class ShoppingCart {
   @PrimaryGeneratedColumn()
   serial: number;

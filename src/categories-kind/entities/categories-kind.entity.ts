@@ -7,7 +7,7 @@ export class CategoriesKind {
   @Column({ unique: true })
   categorykindid: number;
   @Column({ type: 'varchar', length: 50, nullable: false, default: '' })
-  categorykidname: string;
+  categorykindname: string;
   @OneToMany(() => Category, (category) => category.categorykind)
-  category: Category[];
+  categories: Category[];
 }

@@ -1,7 +1,7 @@
 import { Order } from 'src/orders/entities/order.entity';
 import { ShoppingCart } from 'src/shopping-cart/entities/shopping-cart.entity';
-import { Column, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+@Entity('customers')
 export class Customer {
   @PrimaryGeneratedColumn()
   serial: number;

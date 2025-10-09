@@ -1,7 +1,7 @@
 import { CategoriesKind } from 'src/categories-kind/entities/categories-kind.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
-import { PrimaryGeneratedColumn } from 'typeorm/browser';
+import { PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('categories')
 export class Category {
@@ -9,7 +9,9 @@ export class Category {
   serial: number;
   @Column({ type: 'varchar', length: 200, nullable: false, default: '' })
   categoryname: string;
-  @ManyToOne(() => CategoriesKind, (categorykind) => categorykind.category, {
+  @Column({ unique: true })
+  categoryid: number;
+  @ManyToOne(() => CategoriesKind, (categorykind) => categorykind.categories, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })

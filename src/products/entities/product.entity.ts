@@ -62,4 +62,3 @@ export class Product {
   @OneToMany(() => OrderDetail, (orderDetail) => orderDetail.orderid)
   orderDetails: OrderDetail[];
 }
-

@@ -1,6 +1,6 @@
 import { ProductsColor } from 'src/products-colors/entities/products-color.entity';
-import { Column, OneToMany, PrimaryGeneratedColumn } from 'typeorm/browser';
-
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+@Entity('colors')
 export class Color {
   @PrimaryGeneratedColumn()
   serial: number;
