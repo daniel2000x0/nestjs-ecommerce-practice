@@ -1,15 +1,15 @@
 import {
-  IsString,
-  IsEmail,
   IsBoolean,
   IsDateString,
+  IsEmail,
   IsInt,
   IsOptional,
+  IsString,
   Length,
   MaxLength,
 } from 'class-validator';
 
-export class CreateUserDto {
+export class RegisterUserDto {
   @IsInt()
   userid: number;
 
