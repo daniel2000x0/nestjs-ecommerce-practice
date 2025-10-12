@@ -4,19 +4,21 @@ import { UsersRole } from 'src/users-roles/entities/users-role.entity';
 import {
   Column,
   Entity,
+  Generated,
   JoinColumn,
   ManyToOne,
   OneToMany,
-  PrimaryColumn,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
-  serial: number;
-  @PrimaryColumn()
   userid: number;
+
+  @Column()
+  @Generated('increment')
+  serial: number;
   @Column({ length: 20 })
   userfirstname: string;
   @Column({ length: 20 })

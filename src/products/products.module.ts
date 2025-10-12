@@ -9,6 +9,7 @@ import { ProductsColor } from 'src/products-colors/entities/products-color.entit
 import { OrderDetail } from 'src/order-details/entities/order-detail.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Category } from 'src/categories/entities/category.entity';
+import { Product } from './entities/product.entity';
 
 @Module({
   imports: [
@@ -19,10 +20,12 @@ import { Category } from 'src/categories/entities/category.entity';
       ProductsSize,
       User,
       OrderDetail,
+      Product,
       Category,
     ]),
   ],
   controllers: [ProductsController],
   providers: [ProductsService],
+  exports: [ProductsService],
 })
 export class ProductsModule {}

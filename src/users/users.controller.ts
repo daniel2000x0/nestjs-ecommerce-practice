@@ -9,7 +9,7 @@ import {
   Res,
   ValidationPipe,
   HttpStatus,
-  HttpException,
+  ConflictException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -19,19 +19,31 @@ import { LoginUserDto } from './dto/login.dto';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
-  @Post('users')
-  registerUser(
+
+  @Post()
+  async registerUser(
     @Res() response,
-    @Body(new ValidationPipe()) createPersona: CreateUserDto,
+    @Body(new ValidationPipe()) createUser: CreateUserDto,
   ) {
     try {
-      const newPersona = this.usersService.create(createPersona);
-      return newPersona;
+      const newUser = await this.usersService.create(createUser); // <- await
+      return response.status(201).json({
+        message: 'Usuario creado correctamente',
+        user: newUser.user,
+      });
     } catch (error) {
-      throw new HttpException(
-        `Error en el servidor: ${error}`,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      if (error instanceof ConflictException) {
+        return response.status(HttpStatus.CONFLICT).json({
+          message: error.message,
+          statusCode: 409,
+        });
+      }
+
+      return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message: 'Error en el servidor',
+        error: error.message,
+        statusCode: 500,
+      });
     }
   }
 
@@ -39,12 +51,6 @@ export class UsersController {
   async loginUser(@Body() login: LoginUserDto) {
     return await this.usersService.login(login);
   }
-
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
-  }
-
   @Get()
   findAll() {
     return this.usersService.findAll();

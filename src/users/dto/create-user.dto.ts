@@ -10,8 +10,9 @@ import {
 } from 'class-validator';
 
 export class CreateUserDto {
+  @IsOptional()
   @IsInt()
-  userid: number;
+  serial?: number;
 
   @IsString()
   @Length(1, 20)

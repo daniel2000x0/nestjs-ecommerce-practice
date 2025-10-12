@@ -1,4 +1,10 @@
-import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  HttpException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -16,17 +22,53 @@ export class UsersService {
     private readonly userCartRepository: Repository<User>,
     private jwtService: JwtService,
   ) {}
-  async create(createUserDto: CreateUserDto): Promise<User> {
-    const { userpassword } = createUserDto;
-    const plainToHash = await hash(userpassword, 10);
-    const userData: CreateUserDto = {
-      ...createUserDto,
-      userpassword: plainToHash,
-    };
-    const createdUser: User = this.userCartRepository.create(userData);
+  async create(
+    createUserDto: CreateUserDto,
+  ): Promise<{ message: string; user: User }> {
+    try {
+      // Hashear la contraseña
+      const hashedPassword = await hash(createUserDto.userpassword, 10);
 
-    // Guardar en la base de datos
-    return await this.userCartRepository.save(createdUser);
+      // Verificar si el email ya existe
+      const existingUser = await this.userCartRepository.findOne({
+        where: { useremail: createUserDto.useremail },
+      });
+
+      if (existingUser) {
+        throw new ConflictException(
+          `El correo "${createUserDto.useremail}" ya está registrado`,
+        );
+      }
+
+      // Preparar los datos del usuario
+      const userData: CreateUserDto = {
+        ...createUserDto,
+        userpassword: hashedPassword,
+      };
+
+      const newUser: User = this.userCartRepository.create(userData);
+
+      // Guardar en la base de datos
+      const savedUser = await this.userCartRepository.save(newUser);
+
+      // Retornar mensaje de éxito
+      return {
+        message: 'Usuario creado correctamente',
+        user: savedUser,
+      };
+    } catch (error) {
+      console.error('Error al crear usuario:', error);
+
+      // Si es un error de duplicidad de Postgres
+      if (error.code === '23505') {
+        throw new ConflictException(
+          `El correo "${createUserDto.useremail}" ya está registrado`,
+        );
+      }
+
+      // Cualquier otro error inesperado
+      throw new InternalServerErrorException('Error al crear el usuario');
+    }
   }
   async login(user: LoginUserDto) {
     const { userpassword, useremail } = user;
