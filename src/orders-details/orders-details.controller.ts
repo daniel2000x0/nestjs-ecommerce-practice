@@ -1,34 +1,75 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  HttpStatus,
+  HttpException,
+} from '@nestjs/common';
 import { OrdersDetailsService } from './orders-details.service';
 import { CreateOrdersDetailDto } from './dto/create-orders-detail.dto';
 import { UpdateOrdersDetailDto } from './dto/update-orders-detail.dto';
 
 @Controller('orders-details')
 export class OrdersDetailsController {
-  constructor(private readonly ordersDetailsService: OrdersDetailsService) {}
+  constructor(private readonly orderDetailsService: OrdersDetailsService) {}
 
-  @Post()
-  create(@Body() createOrdersDetailDto: CreateOrdersDetailDto) {
-    return this.ordersDetailsService.create(createOrdersDetailDto);
+  @Post('orderDetail')
+  create(@Body() createOrderDetailDto: CreateOrdersDetailDto) {
+    try {
+      return this.orderDetailsService.create(createOrderDetailDto);
+    } catch (error: unknown) {
+      console.error('Error  creating order detail:', error);
+
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknow error';
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: `Error: ${errorMessage}`,
+          error: 'Bad Request',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
-  @Get()
-  findAll() {
-    return this.ordersDetailsService.findAll();
+  @Get('orderDetail')
+  async findAll() {
+    try {
+      return await this.orderDetailsService.findAll();
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknow error';
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: `Error: ${errorMessage}`,
+          error: 'Bad Request',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.ordersDetailsService.findOne(+id);
+    return this.orderDetailsService.findOne(+id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrdersDetailDto: UpdateOrdersDetailDto) {
-    return this.ordersDetailsService.update(+id, updateOrdersDetailDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateOrderDetailDto: UpdateOrdersDetailDto,
+  ) {
+    return this.orderDetailsService.update(+id, updateOrderDetailDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.ordersDetailsService.remove(+id);
+    return this.orderDetailsService.remove(+id);
   }
 }

@@ -1,6 +1,6 @@
 import { Category } from 'src/categories/entities/category.entity';
 import { Manufacture } from 'src/manufactures/entities/manufacture.entity';
-import { OrderDetail } from 'src/order-details/entities/order-detail.entity';
+import { OrdersDetail } from 'src/orders-details/entities/orders-detail.entity';
 import { ProductsColor } from 'src/products-colors/entities/products-color.entity';
 import { ProductsImage } from 'src/products-images/entities/products-image.entity';
 import { ProductsSize } from 'src/products-sizes/entities/products-size.entity';
@@ -59,6 +59,6 @@ export class Product {
   @ManyToOne(() => User, (user) => user.product)
   @JoinColumn({ name: 'productuser', referencedColumnName: 'userid' })
   productuser: User;
-  @OneToMany(() => OrderDetail, (orderDetail) => orderDetail.orderid)
-  orderDetails: OrderDetail[];
+  @OneToMany(() => OrdersDetail, (orderDetail) => orderDetail.orderid)
+  orderDetails: OrdersDetail[];
 }

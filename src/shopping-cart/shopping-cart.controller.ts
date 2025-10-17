@@ -17,7 +17,7 @@ export class ShoppingCartController {
 
   @Post()
   create(@Body() createShoppingCartDto: CreateShoppingCartDto) {
-    return this.shoppingCartService.create(createShoppingCartDto);
+    return this.shoppingCartService.AddCart(createShoppingCartDto);
   }
 
   @Get()

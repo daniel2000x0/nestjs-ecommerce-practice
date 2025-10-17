@@ -6,10 +6,10 @@ import { ProductsImage } from 'src/products-images/entities/products-image.entit
 import { ProductsSize } from 'src/products-sizes/entities/products-size.entity';
 import { Manufacture } from 'src/manufactures/entities/manufacture.entity';
 import { ProductsColor } from 'src/products-colors/entities/products-color.entity';
-import { OrderDetail } from 'src/order-details/entities/order-detail.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Category } from 'src/categories/entities/category.entity';
 import { Product } from './entities/product.entity';
+import { OrdersDetail } from 'src/orders-details/entities/orders-detail.entity';
 
 @Module({
   imports: [
@@ -19,7 +19,7 @@ import { Product } from './entities/product.entity';
       ProductsColor,
       ProductsSize,
       User,
-      OrderDetail,
+      OrdersDetail,
       Product,
       Category,
     ]),

@@ -27,7 +27,7 @@ export class ShoppingCartService {
   //  end constructor
 
   // -- metodo  para  generar un carrito  de   compras--
-  async create(dto: CreateShoppingCartDto) {
+  async AddCart(dto: CreateShoppingCartDto) {
     // instancia   cliente   y  lkllama  el   metodo  de   encontrar   a el  cliente   que  buscara al   cliente  apartir   el  dogigo  num enviado
     const customer = await this.customerRepository.findOne({
       where: { customerid: dto.customerid },

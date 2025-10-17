@@ -1,26 +1,26 @@
 import { Injectable } from '@nestjs/common';
-import { CreateOrdersDetailDto } from './dto/create-orders-detail.dto';
 import { UpdateOrdersDetailDto } from './dto/update-orders-detail.dto';
+import { CreateOrdersDetailDto } from './dto/create-orders-detail.dto';
 
 @Injectable()
 export class OrdersDetailsService {
-  create(createOrdersDetailDto: CreateOrdersDetailDto) {
-    return 'This action adds a new ordersDetail';
+  constructor() {}
+  create(createOrderDetailDto: CreateOrdersDetailDto) {
+    return createOrderDetailDto;
   }
-
   findAll() {
-    return `This action returns all ordersDetails`;
+    return '';
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} ordersDetail`;
+    return `This action returns a #${id} orderDetail`;
   }
 
-  update(id: number, updateOrdersDetailDto: UpdateOrdersDetailDto) {
-    return `This action updates a #${id} ordersDetail`;
+  update(id: number, updateOrderDetailDto: UpdateOrdersDetailDto) {
+    return updateOrderDetailDto;
   }
 
   remove(id: number) {
-    return `This action removes a #${id} ordersDetail`;
+    return `This action removes a #${id} orderDetail`;
   }
 }

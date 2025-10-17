@@ -29,13 +29,15 @@ import { ProductsColor } from './products-colors/entities/products-color.entity'
 import { Country } from './countries/entities/country.entity';
 import { UsersRole } from './users-roles/entities/users-role.entity';
 import { Size } from './sizes/entities/size.entity';
-import { OrderDetail } from './order-details/entities/order-detail.entity';
+
 import { ShoppingCart } from './shopping-cart/entities/shopping-cart.entity';
 import { Role } from './roles/entities/role.entity';
 import { Order } from './orders/entities/order.entity';
 import { Category } from './categories/entities/category.entity';
 import { CategoriesKind } from './categories-kind/entities/categories-kind.entity';
 import { Customer } from './customers/entities/customer.entity';
+import { OrdersDetail } from './orders-details/entities/orders-detail.entity';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
@@ -61,7 +63,7 @@ import { Customer } from './customers/entities/customer.entity';
         Country,
         UsersRole,
         Size,
-        OrderDetail,
+        OrdersDetail,
         ShoppingCart,
         Role,
         Order,
@@ -80,6 +82,7 @@ import { Customer } from './customers/entities/customer.entity';
     ProductsSizesModule,
     SizesModule,
     ColorsModule,
+    OrdersModule,
     ManufacturesModule,
     ShoppingCartModule,
     OrdersDetailsModule,

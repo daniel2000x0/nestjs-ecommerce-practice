@@ -27,6 +27,6 @@ export class Customer {
   customergender: number;
   @OneToMany(() => ShoppingCart, (shopping) => shopping.customer)
   shopping: ShoppingCart[];
-  @OneToMany(() => Order, (order) => order.customerId)
+  @OneToMany(() => Order, (order) => order.customer)
   orders: Order[];
 }
