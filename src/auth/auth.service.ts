@@ -30,12 +30,13 @@ export class AuthService {
     };
     return data;
   }
-  //  metodo   para  validar   otro metodo de  validar usuario  aun que   ya se valdia dentro de la  funcion  registrar 
+  //  metodo   para  validar   otro metodo de  validar usuario  aun que   ya se valdia dentro de la  funcion  registrar
   async validateUser(username: string, password: string) {
     const user = await this.usersn.findOneWithUserName(username);
     if (!user) throw new HttpException('USER_NOT_FOUND', 404);
     const checkPassword = await compare(password, user.userpassword);
     if (!checkPassword) throw new HttpException('PASSWORD_INVALID', 403);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { userpassword: _, ...result } = user;
     return result;
   }

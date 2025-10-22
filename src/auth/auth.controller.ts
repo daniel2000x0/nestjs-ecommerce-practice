@@ -58,6 +58,7 @@ export class AuthController {
   @UseGuards(RefreshJwtGuard)
   @Post('refresh')
   refreshToken(@Request() req) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     return this.authService.refreshToken(req.user);
   }
 }
