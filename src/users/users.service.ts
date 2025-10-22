@@ -1,28 +1,25 @@
 import {
   ConflictException,
-  HttpException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
-import { compare, hash } from 'bcrypt';
-import { LoginUserDto } from './dto/login.dto';
-import { JwtService } from '@nestjs/jwt';
+import { hash } from 'bcrypt';
+import { RegisterUserDto } from './dto/register.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     // instancia  el  repositorio  de  shopping card para almacenar    los  datos
-    private readonly userCartRepository: Repository<User>,
-    private jwtService: JwtService,
+    private readonly userService: Repository<User>,
   ) {}
-  async create(
+  async Register(
     createUserDto: CreateUserDto,
   ): Promise<{ message: string; user: User }> {
     try {
@@ -30,7 +27,7 @@ export class UsersService {
       const hashedPassword = await hash(createUserDto.userpassword, 10);
 
       // Verificar si el email ya existe
-      const existingUser = await this.userCartRepository.findOne({
+      const existingUser = await this.userService.findOne({
         where: { useremail: createUserDto.useremail },
       });
 
@@ -41,15 +38,15 @@ export class UsersService {
       }
 
       // Preparar los datos del usuario
-      const userData: CreateUserDto = {
+      const userData: RegisterUserDto = {
         ...createUserDto,
         userpassword: hashedPassword,
       };
 
-      const newUser: User = this.userCartRepository.create(userData);
+      const newUser: User = this.userService.create(userData);
 
       // Guardar en la base de datos
-      const savedUser = await this.userCartRepository.save(newUser);
+      const savedUser = await this.userService.save(newUser);
 
       // Retornar mensaje de éxito
       return {
@@ -70,34 +67,24 @@ export class UsersService {
       throw new InternalServerErrorException('Error al crear el usuario');
     }
   }
-  async login(user: LoginUserDto) {
-    const { userpassword, useremail } = user;
-    const findUser = await this.userCartRepository.findOne({
-      where: { useremail },
+  async findOne(email: string) {
+    return await this.userService.findOne({
+      where: { useremail: email },
     });
-    if (!findUser) throw new HttpException('USER_NOT_FOUND', 404);
-
-    const checkPassword = await compare(userpassword, findUser.userpassword);
-    if (!checkPassword) throw new HttpException('PASSWORD_INVALID', 403);
-    const payload = { id: findUser.userid, name: findUser.userfirstname };
-    const token = this.jwtService.sign(payload);
-    const data = {
-      user: findUser,
-      token,
-    };
-    return data;
   }
-
-  findAll() {
-    return this.userCartRepository.find();
+  async finId(id: number) {
+    return await this.userService.findOne({
+      where: { userid: id },
+    });
   }
-
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOneWithUserName(userName: string) {
+    return await this.userService.findOne({
+      where: { useremail: userName },
+    });
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
-    const updateduser = await this.userCartRepository.findOne({
+    const updateduser = await this.userService.findOne({
       where: { userid: id },
     });
     if (!updateduser) {
@@ -114,10 +101,6 @@ export class UsersService {
     Object.assign(updateduser, updateUserDto);
 
     // Guardar cambios
-    return await this.userCartRepository.save(updateduser);
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+    return await this.userService.save(updateduser);
   }
 }

@@ -5,21 +5,13 @@ import { UsersRole } from 'src/users-roles/entities/users-role.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Product } from 'src/products/entities/product.entity';
 import { Gender } from 'src/genders/entities/gender.entity';
-import { JwtModule } from '@nestjs/jwt';
-import { jwtConstanst } from 'src/jwt/jwt.constants';
-import { JwtStrategy } from 'src/jwt/jwt.strategy';
+
 import { User } from './entities/user.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([User, UsersRole, Product, Gender]),
-    JwtModule.register({
-      secret: jwtConstanst.secret,
-      signOptions: { expiresIn: '10h' },
-    }),
-  ],
+  imports: [TypeOrmModule.forFeature([User, UsersRole, Product, Gender])],
   controllers: [UsersController],
-  providers: [UsersService, JwtStrategy],
+  providers: [UsersService],
   exports: [UsersService],
 })
 export class UsersModule {}

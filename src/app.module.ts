@@ -38,11 +38,18 @@ import { CategoriesKind } from './categories-kind/entities/categories-kind.entit
 import { Customer } from './customers/entities/customer.entity';
 import { OrdersDetail } from './orders-details/entities/orders-detail.entity';
 import { OrdersModule } from './orders/orders.module';
-
+import { AuthModule } from './auth/auth.module';
+let envFilePath = '.env.development';
+if (process.env.ENVIRONMENT === 'PRODUCTION') {
+  envFilePath = '.env.production';
+} else if (process.env.ENVIRONMENT === 'TEST') {
+  envFilePath = '.env.testing';
+}
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true, // ⚡ hace que esté disponible en todo el proyecto
+      envFilePath,
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -90,6 +97,7 @@ import { OrdersModule } from './orders/orders.module';
     UsersRolesModule,
     CustomersModule,
     CategoriesKindModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

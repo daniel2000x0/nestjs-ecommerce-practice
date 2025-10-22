@@ -11,7 +11,7 @@ import {
 
 export class RegisterUserDto {
   @IsInt()
-  userid: number;
+  userid?: number;
 
   @IsString()
   @Length(1, 20)
