@@ -23,10 +23,19 @@ export class AuthService {
     const checkPassword = await compare(userpassword, findUser.userpassword);
     if (!checkPassword) throw new HttpException('PASSWORD_INVALID', 403);
     const payload = { id: findUser.userid, name: findUser.userfirstname };
-    const token = this.jwtService.sign(payload);
+
+    const token = this.jwtService.sign(payload, {
+      secret: process.env.JWT_REFRESH_SECRET,
+      expiresIn: '7d', // 7 días
+    });
+    const refreshToken = this.jwtService.sign(payload, {
+      secret: process.env.JWT_REFRESH_SECRET,
+      expiresIn: '7d', // 7 días
+    });
     const data = {
       user: findUser,
       token,
+      refreshToken,
     };
     return data;
   }
@@ -42,15 +51,14 @@ export class AuthService {
   }
 
   refreshToken(user: User) {
-    const payload = {
-      username: user.useremail,
-      sub: {
-        name: user.userfirstname,
-      },
-    };
+    const payload = { id: user.userid, name: user.userfirstname };
 
     return {
       accessToken: this.jwtService.sign(payload),
+      refreshToken: this.jwtService.sign(payload, {
+        secret: process.env.JWT_REFRESH_SECRET,
+        expiresIn: '7d', // 7 días
+      }),
     };
   }
 }

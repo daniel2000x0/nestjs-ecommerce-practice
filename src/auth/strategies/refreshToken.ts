@@ -7,13 +7,13 @@ export class RefreshJwtStrategy extends PassportStrategy(
 ) {
   constructor() {
     super({
-      jwtFromRequest: ExtractJwt.fromBodyField('refresh'),
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: `${process.env.jwt_secret}`,
+      secretOrKey: process.env.JWT_REFRESH_SECRET,
     });
   }
 
   validate(payload: any) {
-    return { user: payload.sub, username: payload.username };
+    return { id: payload.id, name: payload.name };
   }
 }
