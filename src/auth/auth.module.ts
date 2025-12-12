@@ -6,9 +6,12 @@ import { User } from 'src/users/entities/user.entity';
 import { AuthController } from './auth.controller';
 import { RefreshJwtStrategy } from './strategies/refreshToken';
 
-import { UsersService } from 'src/users/users.service';
 import { LocalStrategy } from './strategies/local-strategy';
 import { JwtStrategy } from './strategies/jwt-strategy';
+import { CustomerModule } from './customer/customer.module';
+
+import { UsersModule } from 'src/users/users.module';
+import { RolesModule } from 'src/roles/roles.module';
 
 @Module({
   providers: [
@@ -16,14 +19,18 @@ import { JwtStrategy } from './strategies/jwt-strategy';
     LocalStrategy,
     JwtStrategy,
     RefreshJwtStrategy,
-    UsersService,
+    //UsersService,
+    //RolesService,
   ],
   imports: [
     TypeOrmModule.forFeature([User]),
     JwtModule.register({
-      secret: `${process.env.jwt_secret}`,
+      secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '60s' },
     }),
+    CustomerModule,
+    UsersModule,
+    RolesModule,
   ],
   controllers: [AuthController],
 })

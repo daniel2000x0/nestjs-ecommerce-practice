@@ -7,10 +7,11 @@ import { Customer } from 'src/customers/entities/customer.entity';
 
 import { Order } from './entities/order.entity';
 import { OrdersDetail } from 'src/orders-details/entities/orders-detail.entity';
+import { JwtStrategy } from 'src/auth/strategies/jwt-strategy';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Customer, Country, OrdersDetail, Order])],
   controllers: [OrdersController],
-  providers: [OrdersService],
+  providers: [OrdersService, JwtStrategy],
 })
 export class OrdersModule {}

@@ -4,8 +4,6 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
 import { DataSource, Repository } from 'typeorm';
-
-import { CreateOrderRequestDto } from './dto/createOrderRequest.dto.tsto';
 import { OrdersDetail } from 'src/orders-details/entities/orders-detail.entity';
 
 @Injectable()
@@ -21,47 +19,81 @@ export class OrdersService {
     const createdorder: Order = this.repoorder.create(createOrderDto);
     return await this.repoorder.save(createdorder);
   }
-
-  async regisorder(createDto: CreateOrderRequestDto) {
+  // metodo de registro   d e las  ordenes
+  async regisorder(createDto: CreateOrderDto) {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const { order, orderDetails } = createDto;
+      const { orderDetails } = createDto;
 
-      // 👇 Mapeo explícito del DTO a la entidad Order
-      const newOrder = this.repoorder.create({
-        orderid: order.orderid,
-        customerid: order.customerid,
-        customerName: order.customerName,
-        customercountry: order.customercountry,
-        customercity: order.customercity,
-        customerregion: order.customerregion,
-        customerzip: order.customerzip,
-        customeraddress: order.customeraddress,
-        customerphone: order.customerphone,
+      const total = orderDetails.reduce((sum, item) => {
+        const itemTotal =
+          item.quantity * item.unitprice * (1 - (item.discount ?? 0) / 100);
+        return sum + itemTotal;
+      }, 0);
+
+      const order = this.repoorder.create({
+        customerid: createDto.customerid,
+        customername: createDto.customername,
+        customercountry: createDto.customercountry,
+        customercity: createDto.customercity,
+        customerregion: createDto.customerregion,
+        customerzip: createDto.customerzip,
+        customeraddress: createDto.customeraddress,
+        customerphone: createDto.customerphone,
+        total_general: total,
       });
+      const savedOrder = await queryRunner.manager.save(order);
 
-      const savedorder = await queryRunner.manager.save(Order, newOrder);
-
-      const detailSave = orderDetails.map((detailDto) => {
+      const details = orderDetails.map((d) => {
         const detail = new OrdersDetail();
-        detail.order = savedorder;
-        detail.productid = detailDto.productid;
-        detail.quantity = detailDto.quantity;
-        detail.unitprice = detailDto.unitprice;
-        detail.discount = detailDto.discount ?? 0;
+        detail.orderid = order.orderid;
+        detail.productid = d.productid;
+        detail.quantity = d.quantity;
+        detail.unitprice = d.unitprice;
+        detail.discount = d.discount ?? 0;
+        detail.total = d.quantity * d.unitprice * (1 - (d.discount ?? 0) / 100);
         return detail;
       });
-      const savedDetails = await queryRunner.manager.save(
-        OrdersDetail,
-        detailSave,
-      );
+
+      // 3. Guardar todos los detalles
+      await queryRunner.manager.save(details);
+
       await queryRunner.commitTransaction();
-      return {
-        ...savedorder,
-        details: savedDetails,
-      };
+      return savedOrder;
+
+      /* const newOrder = this.repoorder.create({
+        orderid: createDto.orderid,
+        customerid: createDto.customerid,
+        customername: createDto.customername,
+        customercountry: createDto.customercountry,
+        customercity: createDto.customercity,
+        customerregion: createDto.customerregion,
+        customerzip: createDto.customerzip,
+        customeraddress: createDto.customeraddress,
+        customerphone: createDto.customerphone,
+        details: orderDetails.map((detailDto) => {
+          const detail = new OrdersDetail();
+          detail.orderid = newOrder.orderid;
+          detail.productid = detailDto.productid;
+          detail.quantity = detailDto.quantity;
+          detail.unitprice = detailDto.unitprice;
+          detail.discount = detailDto.discount ?? 0;
+          detail.total =
+            detailDto.quantity *
+            detailDto.unitprice *
+            (1 - (detailDto.discount ?? 0) / 100);
+
+          return detail;
+        }),
+        total_general: total,
+      });*/
+      //    return this.repoorder.save(newOrder);
+      /*   const savedOrder = await queryRunner.manager.save(newOrder);
+
+      await queryRunner.commitTransaction();
+      return savedOrder;*/
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw new Error('Error al  registrar la  order' + error.message);
@@ -69,6 +101,8 @@ export class OrdersService {
       await queryRunner.release();
     }
   }
+
+  // end  metodo
   async findAll() {
     const orders = await this.repoorder.find();
     return orders;
@@ -79,14 +113,47 @@ export class OrdersService {
   }
 
   async update(id: number, updateOrderDto: UpdateOrderDto) {
-    const updateorder = await this.repoorder.findOne({
-      where: { orderid: id },
-    });
-    if (!updateorder) {
-      throw new NotFoundException(`Usuario con id ${id} no encontrado`);
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const updateorder = await this.repoorder.findOne({
+        where: { orderid: id },
+        relations: ['oderDetails'],
+      });
+      if (!updateorder) {
+        throw new NotFoundException(`order con id ${id} no encontrado`);
+      }
+      const { orderDetails: ordersDetails, ...orderData } = updateOrderDto;
+      Object.assign(updateorder, orderData);
+
+      if (ordersDetails && ordersDetails.length > 0) {
+        await queryRunner.manager.delete(OrdersDetail, { orderid: id });
+        const ordenDetails = ordersDetails.map((detailDto) => {
+          const detail = new OrdersDetail();
+          detail.orderid = updateorder.orderid;
+          detail.productid = detailDto.productid;
+          detail.quantity = detailDto.quantity;
+          detail.unitprice = detailDto.unitprice;
+          detail.discount = detailDto.discount ?? 0;
+          detail.total =
+            detailDto.quantity *
+            detailDto.unitprice *
+            (1 - (detailDto.discount ?? 0) / 100);
+          return detail;
+        });
+        await queryRunner.manager.save(ordenDetails);
+        updateorder.details = ordenDetails;
+      }
+      const newordersa = await this.repoorder.save(updateorder);
+      await queryRunner.commitTransaction();
+      return newordersa;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
     }
-    Object.assign(updateorder, updateOrderDto);
-    return await this.repoorder.save(updateorder);
   }
 
   remove(id: number) {

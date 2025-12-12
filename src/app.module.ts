@@ -39,6 +39,7 @@ import { Customer } from './customers/entities/customer.entity';
 import { OrdersDetail } from './orders-details/entities/orders-detail.entity';
 import { OrdersModule } from './orders/orders.module';
 import { AuthModule } from './auth/auth.module';
+import { PaymentModule } from './payment/payment.module';
 let envFilePath = '.env.development';
 if (process.env.ENVIRONMENT === 'PRODUCTION') {
   envFilePath = '.env.production';
@@ -98,6 +99,7 @@ if (process.env.ENVIRONMENT === 'PRODUCTION') {
     CustomersModule,
     CategoriesKindModule,
     AuthModule,
+    PaymentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

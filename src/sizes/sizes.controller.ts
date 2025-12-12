@@ -1,7 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { SizesService } from './sizes.service';
 import { CreateSizeDto } from './dto/create-size.dto';
 import { UpdateSizeDto } from './dto/update-size.dto';
+import { RoleEnum } from 'common/enums/rol.enum';
+import { Auth } from 'src/auth/decorators/auth.decorator';
 
 @Controller('sizes')
 export class SizesController {
@@ -11,7 +21,7 @@ export class SizesController {
   create(@Body() createSizeDto: CreateSizeDto) {
     return this.sizesService.create(createSizeDto);
   }
-
+  @Auth([RoleEnum.MANAGER])
   @Get()
   findAll() {
     return this.sizesService.findAll();

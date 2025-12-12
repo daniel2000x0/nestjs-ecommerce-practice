@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { UsersService } from 'src/users/users.service';
+import { RolesService } from 'src/roles/roles.service';
 
 @Injectable()
 export class AuthService {
@@ -14,6 +15,7 @@ export class AuthService {
     private readonly userService: Repository<User>,
     private readonly usersn: UsersService,
     private jwtService: JwtService,
+    private readonly rol_user: RolesService,
   ) {}
   async login(user: LoginUserDto) {
     const { userpassword, useremail } = user;
@@ -22,10 +24,15 @@ export class AuthService {
 
     const checkPassword = await compare(userpassword, findUser.userpassword);
     if (!checkPassword) throw new HttpException('PASSWORD_INVALID', 403);
-    const payload = { id: findUser.userid, name: findUser.userfirstname };
+    const userRoles = await this.rol_user.findOne(findUser.userid);
+    const payload = {
+      id: findUser.userid,
+      name: findUser.userfirstname,
+      roles: userRoles,
+    };
 
     const token = this.jwtService.sign(payload, {
-      secret: process.env.JWT_REFRESH_SECRET,
+      secret: process.env.JWT_SECRET,
       expiresIn: '7d', // 7 días
     });
     const refreshToken = this.jwtService.sign(payload, {

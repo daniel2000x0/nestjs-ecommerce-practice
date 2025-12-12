@@ -11,6 +11,8 @@ import { Repository } from 'typeorm';
 import { hash } from 'bcrypt';
 import { RegisterUserDto } from './dto/register.dto';
 import { CreateUserDto } from './dto/create-user.dto';
+import { RolesAddDto } from './dto/rolesadd.dto';
+import { UsersRole } from 'src/users-roles/entities/users-role.entity';
 
 @Injectable()
 export class UsersService {
@@ -18,7 +20,33 @@ export class UsersService {
     @InjectRepository(User)
     // instancia  el  repositorio  de  shopping card para almacenar    los  datos
     private readonly userService: Repository<User>,
+    @InjectRepository(UsersRole)
+    private readonly userRoleService: Repository<UsersRole>,
   ) {}
+
+  async roles(
+    rol: RolesAddDto,
+  ): Promise<{ message: string; save: UsersRole | null }> {
+    try {
+      let save: UsersRole | null = null;
+      for (const roleId of rol.roleids) {
+        const newUserRole: UsersRole = this.userRoleService.create({
+          userid: { userid: rol.userid } as User,
+          roleid: { roleid: roleId } as any,
+        });
+        save = await this.userRoleService.save(newUserRole);
+      }
+      return {
+        message: 'Roles asignados correctamente',
+        save,
+      };
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException('Error al asignar roles');
+    }
+  }
+  async;
+
   async Register(
     createUserDto: CreateUserDto,
   ): Promise<{ message: string; user: User }> {

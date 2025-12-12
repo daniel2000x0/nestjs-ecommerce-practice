@@ -1,3 +1,4 @@
+import { IsNotEmpty, isNotEmpty } from 'class-validator';
 import { Country } from 'src/countries/entities/country.entity';
 import { Customer } from 'src/customers/entities/customer.entity';
 import { OrdersDetail } from 'src/orders-details/entities/orders-detail.entity';
@@ -16,7 +17,9 @@ import {
 export class Order {
   @PrimaryGeneratedColumn()
   serial: number;
-  @Column()
+  
+
+  @Column({ type: 'int', generated: 'increment', unique: true })
   orderid: number;
   @ManyToOne(() => Customer, (customer) => customer.orders, {
     onDelete: 'CASCADE',
@@ -35,7 +38,7 @@ export class Order {
   @Column({ name: 'customercountry' })
   customercountry: number;
   @Column({ name: 'customername', type: 'varchar', length: 100 })
-  customerName: string;
+  customername: string;
   @Column({ name: 'customercity', type: 'varchar', length: 100 })
   customercity: string;
 
@@ -53,6 +56,10 @@ export class Order {
     nullable: true,
   })
   customerphone: string;
+
+  @Column({ type: 'numeric', precision: 12, scale: 2, nullable: true })
+  total_general: number;
+
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   orderdate: Date;
   @OneToMany(() => OrdersDetail, (detail) => detail.order, { cascade: true })

@@ -28,6 +28,33 @@ export class AuthController {
   async loginUser(@Body() login: LoginUserDto) {
     return await this.authService.login(login);
   }
+  @Post('admin')
+  async registerAdmin(
+    @Res() response,
+    @Body(new ValidationPipe()) createUser: CreateUserDto,
+  ) {
+    try {
+      const newUser = await this.userService.Register(createUser); // <- await
+      return response.status(201).json({
+        message: 'Administrador creado correctamente',
+        user: newUser.user,
+      });
+    } catch (error) {
+      if (error instanceof ConflictException) {
+        return response.status(HttpStatus.CONFLICT).json({
+          message: error.message,
+          statusCode: 409,
+        });
+      }
+
+      return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message: 'Error en el servidor',
+        error: error.message,
+        statusCode: 500,
+      });
+    }
+  }
+
   @Post('registrar')
   async registerUser(
     @Res() response,

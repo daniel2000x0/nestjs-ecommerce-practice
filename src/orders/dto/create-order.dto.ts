@@ -1,19 +1,30 @@
-import { IsInt, IsNotEmpty, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  ArrayMinSize,
+  IsArray,
+  IsInt,
+  IsNotEmpty,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
+import { OrdersDetailDto } from 'src/orders-details/dto/ordenDetail.dto';
 
 export class CreateOrderDto {
-  @IsInt()
-  @IsNotEmpty()
-  orderid: number;
+  //@IsInt()
+  //@IsOptional()
+  // orderid?: number;
 
   @IsInt()
   @IsNotEmpty()
   customerid: number;
+
   @IsInt()
   @IsNotEmpty()
   customercountry: number;
+
   @IsString()
   @IsNotEmpty()
-  customerName: string;
+  customername: string;
 
   @IsString()
   @IsNotEmpty()
@@ -34,4 +45,10 @@ export class CreateOrderDto {
   @IsString()
   @IsNotEmpty()
   customerphone: string;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @ArrayMinSize(1)
+  @Type(() => OrdersDetailDto)
+  orderDetails: OrdersDetailDto[];
 }

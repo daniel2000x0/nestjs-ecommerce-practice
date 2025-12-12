@@ -45,7 +45,6 @@ export class User {
   })
   @JoinColumn({ name: 'productuser', referencedColumnName: 'productid' })
   product: Product;
-
-  @OneToMany(() => UsersRole, (user) => user.roleid)
+  @OneToMany(() => UsersRole, (ur) => ur.userid)
   rolusers: UsersRole[];
 }

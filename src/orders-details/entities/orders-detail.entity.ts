@@ -11,13 +11,10 @@ import {
 export class OrdersDetail {
   @PrimaryGeneratedColumn()
   serial: number;
-
-  @Column()
-  orderid: number;
-
   @Column()
   productid: number;
-
+  @Column()
+  orderid: number;
   @Column({ type: 'smallint' })
   quantity: number;
 
@@ -27,6 +24,8 @@ export class OrdersDetail {
   @Column({ type: 'smallint', default: 0 })
   discount: number;
 
+  @Column({ type: 'numeric', precision: 12, scale: 2 })
+  total: number;
   // 🔗 Relaciones
 
   @ManyToOne(() => Order, (order) => order.details, {

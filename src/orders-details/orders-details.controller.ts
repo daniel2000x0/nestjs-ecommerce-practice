@@ -38,9 +38,9 @@ export class OrdersDetailsController {
   }
 
   @Get('orderDetail')
-  async findAll() {
+  findAll() {
     try {
-      return await this.orderDetailsService.findAll();
+      return this.orderDetailsService.findAll();
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : 'Unknow error';
