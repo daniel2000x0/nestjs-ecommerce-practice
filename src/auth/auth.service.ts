@@ -25,12 +25,14 @@ export class AuthService {
     const checkPassword = await compare(userpassword, findUser.userpassword);
     if (!checkPassword) throw new HttpException('PASSWORD_INVALID', 403);
     const userRoles = await this.rol_user.findOne(findUser.userid);
+
+    const onerol = userRoles.map((role) => role.roleid);
     const payload = {
       id: findUser.userid,
       name: findUser.userfirstname,
-      roles: userRoles,
+      roles: onerol,
     };
-
+    console.log(userRoles);
     const token = this.jwtService.sign(payload, {
       secret: process.env.JWT_SECRET,
       expiresIn: '7d', // 7 días
