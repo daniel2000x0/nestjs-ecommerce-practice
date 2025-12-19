@@ -16,6 +16,7 @@ import { UsersService } from 'src/users/users.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { RefreshJwtGuard } from './guards/refresh-jwt-auth.guard';
+import { OAuthTokenDto } from './dto/oauth-token.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -87,5 +88,29 @@ export class AuthController {
   refreshToken(@Request() req) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     return this.authService.refreshToken(req.user);
+  }
+
+  @Post('oauth/token')
+  async oauth2Token(
+    @Body(new ValidationPipe({ whitelist: true }))
+    body: OAuthTokenDto,
+  ) {
+    const {
+      grant_type,
+      username,
+      password,
+      refresh_token,
+      client_id,
+      client_secret,
+    } = body;
+
+    return this.authService.oauth2Token(
+      grant_type,
+      username,
+      password,
+      refresh_token,
+      client_id,
+      client_secret,
+    );
   }
 }

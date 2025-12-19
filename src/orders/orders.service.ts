@@ -19,7 +19,7 @@ export class OrdersService {
     const createdorder: Order = this.repoorder.create(createOrderDto);
     return await this.repoorder.save(createdorder);
   }
-  // metodo de registro   d e las  ordenes
+  // metodo de registro   de las  ordenes
   async regisorder(createDto: CreateOrderDto) {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();

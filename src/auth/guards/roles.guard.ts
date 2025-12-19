@@ -19,7 +19,10 @@ export class RolesGuard implements CanActivate {
       return true;
     }
     const { user } = context.switchToHttp().getRequest();
-    const arraroles = user.roles?.map((r) => r.roleid) || [];
+    if (!user || !user.roles) {
+      throw new ForbiddenException('User authentication required');
+    }
+    /*const arraroles = user.roles?.map((r) => r.roleid) || [];
     console.log(arraroles);
     const roles = rolest.some((roler) => arraroles.includes(roler));
     if (user.role === RoleEnum.ADMIN) {
@@ -27,8 +30,24 @@ export class RolesGuard implements CanActivate {
     }
     if (!roles) {
       throw new ForbiddenException('ACCESO DENEGADO');
-    }
+    }*/
+    const userRoles: RoleEnum[] = this.extractRoleIds(user.roles);
 
+    const hasRole = rolest.some(
+      (role) => userRoles.includes(role), // ✅ SIN ERROR
+    );
+    if (!hasRole) {
+      throw new ForbiddenException('ACCESO DENEGADO');
+    }
     return true;
+  }
+  //metodo  extraer  roles opcion
+  private extractRoleIds(roles: any[]): any[] {
+    return roles.map((role) => {
+      if (typeof role === 'object') {
+        return role.roleid || role.id || role.name;
+      }
+      return role;
+    });
   }
 }
