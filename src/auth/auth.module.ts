@@ -8,7 +8,6 @@ import { RefreshJwtStrategy } from './strategies/refreshToken';
 
 import { LocalStrategy } from './strategies/local-strategy';
 import { JwtStrategy } from './strategies/jwt-strategy';
-import { CustomerModule } from '../customer/customer.module';
 
 import { UsersModule } from 'src/users/users.module';
 import { RolesModule } from 'src/roles/roles.module';
@@ -17,6 +16,10 @@ import { ConfigModule } from '@nestjs/config';
 import { LocalOAuthStrategy } from './strategies/oauth2.strategy';
 import { RolesGuard } from './guards/roles.guard';
 import { JwtAuthGuard } from './guards/auth.guard';
+import { OrdersDetailsModule } from 'src/orders-details/orders-details.module';
+import { SizesModule } from 'src/sizes/sizes.module';
+import { CustomersModule } from 'src/customers/customers.module';
+import { OrdersModule } from 'src/orders/orders.module';
 @Module({
   providers: [
     AuthService,
@@ -35,15 +38,14 @@ import { JwtAuthGuard } from './guards/auth.guard';
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '60s' },
     }),
-    CustomerModule,
-    UsersModule,
+    forwardRef(() => CustomersModule),
     forwardRef(() => RolesModule),
+    forwardRef(() => UsersModule),
+    forwardRef(() => SizesModule),
+    forwardRef(() => OrdersDetailsModule),
+    forwardRef(() => OrdersModule),
   ],
-  exports: [
-    JwtAuthGuard, // ✅ CLAVE
-    AuthService,
-    JwtModule,
-  ],
+  exports: [JwtAuthGuard, AuthService, JwtModule],
   controllers: [AuthController],
 })
 export class AuthModule {}

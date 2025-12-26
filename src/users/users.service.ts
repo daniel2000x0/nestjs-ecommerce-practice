@@ -7,23 +7,27 @@ import {
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { hash } from 'bcrypt';
-import { RegisterUserDto } from './dto/register.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { RolesAddDto } from './dto/rolesadd.dto';
 import { UsersRole } from 'src/users-roles/entities/users-role.entity';
+import { RoleEnum } from 'common/enums/rol.enum';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User)
+    //@InjectRepository(User)
     // instancia  el  repositorio  de  shopping card para almacenar    los  datos
+    private readonly dataSource: DataSource,
+    @InjectRepository(User)
     private readonly userService: Repository<User>,
     @InjectRepository(UsersRole)
     private readonly userRoleService: Repository<UsersRole>,
   ) {}
-
+  async findAll() {
+    return await this.userService.find();
+  }
   async roles(
     rol: RolesAddDto,
   ): Promise<{ message: string; save: UsersRole | null }> {
@@ -45,7 +49,8 @@ export class UsersService {
       throw new InternalServerErrorException('Error al asignar roles');
     }
   }
-  async;
+  ///ERROR//
+  //async;
 
   async Register(
     createUserDto: CreateUserDto,
@@ -64,23 +69,27 @@ export class UsersService {
           `El correo "${createUserDto.useremail}" ya está registrado`,
         );
       }
-
-      // Preparar los datos del usuario
-      const userData: RegisterUserDto = {
-        ...createUserDto,
-        userpassword: hashedPassword,
-      };
-
-      const newUser: User = this.userService.create(userData);
-
-      // Guardar en la base de datos
-      const savedUser = await this.userService.save(newUser);
-
-      // Retornar mensaje de éxito
-      return {
-        message: 'Usuario creado correctamente',
-        user: savedUser,
-      };
+      return await this.dataSource.transaction(async (manager) => {
+        const userepo = manager.getRepository(User);
+        const userrolrepo = manager.getRepository(UsersRole);
+        const newUser: User = userepo.create({
+          ...createUserDto,
+          userpassword: hashedPassword,
+        });
+        // Guardar en la base de datos
+        const savedUser = await userepo.save(newUser);
+        const userrol = userrolrepo.create({
+          userid: { userid: savedUser.userid },
+          roleid: { roleid: RoleEnum.CUSTOMER },
+        });
+        const rolsaved = await userrolrepo.save(userrol);
+        // Retornar mensaje de éxito
+        console.log(rolsaved);
+        return {
+          message: 'Usuario creado correctamente',
+          user: savedUser,
+        };
+      });
     } catch (error) {
       console.error('Error al crear usuario:', error);
 

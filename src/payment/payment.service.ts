@@ -33,7 +33,7 @@ export class PaymentService {
         },
       ],
       mode: 'payment',
-      customer_email: order.customer.customeremail,
+      customer_email: order.customer.email,
       success_url: `http://localhost:3000/pay/success?order=${order.orderid}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `http://localhost:3000/pay/cancel?order=${order.orderid}`,
     });

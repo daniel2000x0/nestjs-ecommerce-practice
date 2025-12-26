@@ -1,3 +1,441 @@
+  
+  private createOAuthPayload(user: any, roles: any[], client_id: string) {
+    return {
+      sub: user.userid, // OAuth2 estándar
+      name: user.userfirstname,
+      email: user.useremail,
+      roles: roles,
+      client_id: client_id,
+      scope: this.getUserScopes(roles),
+      iss: this.configService.get('APP_URL', 'http://localhost:3000'),
+      aud: client_id,
+    };
+  }
+   private async issuetokencustomer(customer: any, client_id: string) {
+    const customerr = await this.customerService.findOne(customer.customerid);
+
+    if (!customerr) {
+      throw new NotFoundException('cUSTOMER NO ENCONTRADO ');
+    }
+
+    const payload = {
+      sub: customerr.customerid,
+      type: 'customer',
+      email: customerr.email,
+      name: customerr.firstName,
+      client_id,
+    };
+
+    return this.generateTokens(payload);
+  }
+    // async oauth2Token(
+  // grant_type: string,
+  // username?: string,
+  // password?: string,
+  //  refresh_token?: string,
+  // client_id?: string,
+  //client_secret?: string,
+  //) {
+  // 1. Validar credenciales del cliente
+  //  const isValidClient = await this.validateClient(client_id, client_secret);
+  ///  if (!isValidClient) {
+  //   throw new UnauthorizedException('INVALID_CLIENT_CREDENTIALS');
+  //  }
+
+  // 2. Procesar según grant_type
+  // switch (grant_type) {
+  //  case 'password':
+  //   return await this.handlePasswordGrant(username, password, client_id);
+
+  // case 'refresh_token':
+  //  return await this.handleRefreshTokenGrant(refresh_token, client_id);
+
+  // case 'client_credentials':
+  //  return await this.handleClientCredentialsGrant(client_id);
+
+  // default:
+  //    throw new UnauthorizedException('UNSUPPORTED_GRANT_TYPE');
+  // }
+  //}
+
+  
+  
+  ///private getUserScopes(roles: any[]): string {
+  //  const scopes = ['read'];
+
+  // if (roles.includes('ADMIN') || roles.includes('MANAGER')) {
+  //   scopes.push('write');
+  // }
+  // if (roles.includes('ADMIN')) {
+  //  scopes.push('admin');
+  // }
+
+  // return scopes.join(' ');
+  //}
+ 
+ 
+ 
+   //// async introspectToken(token: string): Promise<any> {
+  //  try {
+  //   const payload = await this.jwtService.verifyAsync(token, {
+  //    secret: this.configService.get('JWT_SECRET'),
+  //  });
+
+  // return {
+  //   active: true,
+  // client_id: payload.client_id,
+  //  username: payload.email,
+  // sub: payload.sub,
+  // / exp: payload.exp,
+  // iat: payload.iat,
+  //  scope: payload.scope,
+  //  token_type: 'Bearer',
+  //  };
+  //} catch (error) {
+  //   console.log(error);
+  //   return { active: false };
+  ////  }
+  // }
+
+  //async revokeToken(token: string): Promise<void> {
+  // Implementar blacklist si es necesario
+  // await this.tokenBlacklistService.add(token);
+  //}
+
+  // async getUserById(userId: number): Promise<any> {
+  ////   const user = await this.usersService.findOne(userId);
+  // if (!user) return null;
+
+  // const userRoles = await this.rolUserService.findByUserId(user.userid);
+  //  const roles = userRoles.map((role) => role.roleid);
+
+  //  return {
+  //   ...this.sanitizeUser(user),
+  //  roles: roles,
+  // };
+  //}//
+
+  // =========================================================================
+  // 2. HANDLERS PARA CADA GRANT TYPE
+  // =========================================================================
+
+  // private async handlePasswordGrant(
+  // username: string,
+  // password: string,
+  // client_id: string,
+  // ) {
+  // Validar usuario
+  // const user = await this.validateUser(username, password);
+
+  // Obtener roles del usuario
+  //  const userRoles = await this.rolUserService.findByUserId(user.userid);
+  // const roles = userRoles.map((role) => role.roleid);
+
+  // Crear payload OAuth2 estándar
+  // const payload = this.createOAuthPayload(user, roles, client_id);
+
+  // Generar tokens
+  // const { access_token, refresh_token, expires_in } =
+  //  this.generateTokens(payload);
+
+  // Respuesta OAuth2 estándar
+  // return {
+  //  // access_token,
+  // refresh_token,
+  // token_type: 'bearer',
+  // expires_in,
+  //scope: this.getUserScopes(roles),
+  //   user: {
+  //   id: user.userid,
+  //    name: user.userfirstname,
+  ////    email: user.useremail,
+  // },
+  // };
+  //  }
+
+  // private async handleRefreshTokenGrant(
+  // refresh_token: string,
+  //  client_id: string,
+  // ) {
+  // try {
+  //   // Verificar refresh token
+  //   const payload = await this.verifyRefreshToken(refresh_token);
+
+  // Buscar usuario
+  //  const user = await this.usersService.findById(payload.sub);
+  // if (!user) {
+  //    throw new UnauthorizedException('USER_NOT_FOUND');
+  //  }
+
+  // Obtener roles actualizados
+  //    const userRoles = await this.rolUserService.findByUserId(user.userid);
+  //   const roles = userRoles.map((role) => role.roleid);
+
+  // Nuevo payload
+  //   const newPayload = this.createOAuthPayload(user, roles, client_id);
+
+  // Generar nuevos tokens
+  //   const {
+  //    access_token,
+  //    refresh_token: new_refresh_token,
+  //   expires_in,
+  // } = this.generateTokens(newPayload);
+
+  // return {
+  //  access_token,
+  ////   refresh_token: new_refresh_token,
+  // token_type: 'bearer',
+  //  expires_in,
+  // };
+  // } /catch (error) {
+  //   console.log(error);
+  //  throw new UnauthorizedException('INVALID_REFRESH_TOKEN');
+  // }
+  
+  
+  /* private async passwordGrant(
+    username: string,
+    password: string,
+    client_id: string,
+  ) {
+    // Validar usuario (YA IMPLEMENTADO)
+    const user = await this.validateUser(username, password);
+
+    // Generar tokens (YA IMPLEMENTADO)
+    const { access_token, refresh_token, expires_in } = await this.issueTokens(
+      user,
+      client_id,
+    );
+
+    return {
+      access_token,
+      refresh_token,
+      token_type: 'bearer',
+      expires_in,
+      scope: this.getUserScopes(
+        (await this.rol_user.findOne(user.userid)).map((r) => r.roleid),
+      ),
+      user: {
+        id: user.userid,
+        email: user.useremail,
+        name: user.userfirstname,
+      },
+    };
+  }
+*/
+    // const findUser = await this.usersService.findOne(useremail);
+    //if (!findUser) throw new HttpException('USER_NOT_FOUND', 404);
+
+    //const checkPassword = await compare(userpassword, findUser.userpassword);
+    /// if (!checkPassword) throw new HttpException('PASSWORD_INVALID', 403);
+    ///const userRoles = await this.rol_user.findOne(findUser.userid);
+
+    ///const onerol = userRoles.map((role) => role.roleid);
+    // const payload = {
+    // id: findUser.userid,
+    // name: findUser.userfirstname,
+    //  roles: onerol,
+    //};
+    // console.log(userRoles);
+    //const token = this.jwtService.sign(payload, {
+    // secret: process.env.JWT_SECRET,
+    // expiresIn: '7d', // 7 días
+    //});
+    // const refreshToken = this.jwtService.sign(payload, {
+    //  secret: process.env.JWT_REFRESH_SECRET,
+    // expiresIn: '7d', // 7 días
+    //});
+    // const data = {
+    //  user: findUser,
+    // token,
+    //  refreshToken,
+    //};
+    /// return data;
+ 
+ 
+ 
+  setSession(customer: Customer, token: string): void {
+    this._token = token;
+    localStorage.setItem('currentCustomer', JSON.stringify(customer));
+    localStorage.setItem('access_token', token);
+    this.currentCustomerSubject.next(customer);
+  }
+
+
+
+async Register(
+  createUserDto: CreateUserDto,
+): Promise<{ message: string; user: Omit<User, 'userpassword'> }> {
+  try {
+    const hashedPassword = await hash(createUserDto.userpassword, 10);
+
+    const existingUser = await this.userService.findOne({
+      where: { useremail: createUserDto.useremail },
+    });
+
+    if (existingUser) {
+      throw new ConflictException(
+        `El correo "${createUserDto.useremail}" ya está registrado`,
+      );
+    }
+
+    return await this.dataSource.transaction(async (manager) => {
+      const userRepo = manager.getRepository(User);
+      const userRoleRepo = manager.getRepository(UsersRole);
+
+      const user = userRepo.create({
+        ...createUserDto,
+        userpassword: hashedPassword,
+      });
+
+      const savedUser = await userRepo.save(user);
+
+      const userRole = userRoleRepo.create({
+        userid: savedUser, // mejor así
+        roleid: { roleid: RoleEnum.CUSTOMER },
+      });
+
+      await userRoleRepo.save(userRole);
+
+      const { userpassword, ...userWithoutPassword } = savedUser;
+
+      return {
+        message: 'Usuario creado correctamente',
+        user: userWithoutPassword,
+      };
+    });
+  } catch (error) {
+    console.error('Error al crear usuario:', error);
+
+    if (error.code === '23505') {
+      throw new ConflictException(
+        `El correo "${createUserDto.useremail}" ya está registrado`,
+      );
+    }
+
+    throw new InternalServerErrorException('Error al crear el usuario');
+  }
+}
+
+
+
+
+
+
+
+
+
+import { Gender } from 'src/genders/entities/gender.entity';
+import { Order } from 'src/orders/entities/order.entity';
+import { ShoppingCart } from 'src/shopping-cart/entities/shopping-cart.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+@Entity('customers')
+export class Customer {
+  @PrimaryGeneratedColumn({ type: 'int', name: 'serial' })
+  serial: number;
+
+  @Column({ type: 'int', unique: true, name: 'customerid' })
+  customerId: number;
+
+  @Column({ type: 'varchar', length: 20, name: 'customerfirstname' })
+  firstName: string;
+
+  @Column({ type: 'varchar', length: 20, name: 'customerlastname' })
+  lastName: string;
+
+  @Column({ type: 'varchar', length: 100, unique: true, name: 'customeremail' })
+  email: string;
+
+  @Column({
+    type: 'char',
+    length: 60,
+    name: 'customerpassword',
+    select: false,
+  })
+  password: string;
+
+  @Column({ type: 'date', name: 'customerbirthdate' })
+  birthDate: Date;
+
+  @ManyToOne(() => Gender, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+  @JoinColumn({ name: 'customergender', referencedColumnName: 'genderid' })
+  gender: Gender;
+
+  @CreateDateColumn({
+    type: 'timestamp',
+    name: 'customercreateddate',
+    default: () => 'now()',
+  })
+  createdAt: Date;
+  @OneToMany(() => ShoppingCart, (shopping) => shopping.customer)
+  shopping: ShoppingCart[];
+  @OneToMany(() => Order, (order) => order.customer)
+  orders: Order[];
+}
+
+
+MEJORA 2 (OPCIONAL): NORMALIZAR ROLES EN JWT
+
+La mejor práctica es que el JWT ya tenga los roles como enum:
+
+roles: [RoleEnum.ADMIN, RoleEnum.USER]
+
+
+Así podrías simplificar TODO a esto 👇
+
+const userRoles: RoleEnum[] = user.roles;
+
+const hasRole = rolest.some(role =>
+  userRoles.includes(role),
+);
+
+
+Y eliminar extractRoleIds completamente.
+@Injectable()
+export class JwtStrategy extends PassportStrategy(Strategy) {
+  constructor(config: ConfigService) {
+    super({
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      secretOrKey: config.get('JWT_SECRET'),
+    });
+  }
+
+  async validate(payload: any) {
+    return payload;
+  }
+}
+ 
+
+
+ export const SCOPES_KEY = 'scopes';
+export const Scopes = (...scopes: string[]) =>
+  SetMetadata(SCOPES_KEY, scopes);
+  
+
+  @Injectable()
+export class ScopesGuard implements CanActivate {
+  constructor(private reflector: Reflector) {}
+
+  canActivate(context: ExecutionContext): boolean {
+    const requiredScopes = this.reflector.getAllAndOverride<string[]>(
+      SCOPES_KEY,
+      [context.getHandler(), context.getClass()],
+    );
+
+    if (!requiredScopes) return true;
+
+    const { user } = context.switchToHttp().getRequest();
+    return requiredScopes.includes(user.scope);
+  }
+}
 
 POST /auth/oauth/token
 {

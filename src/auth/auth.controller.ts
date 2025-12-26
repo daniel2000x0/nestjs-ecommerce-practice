@@ -13,31 +13,36 @@ import {
 import { LoginUserDto } from './dto/login.dto';
 import { AuthService } from './auth.service';
 import { UsersService } from 'src/users/users.service';
-import { LocalAuthGuard } from './guards/local-auth.guard';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { RefreshJwtGuard } from './guards/refresh-jwt-auth.guard';
 import { OAuthTokenDto } from './dto/oauth-token.dto';
+import { Roles } from './decorators/roles.decorator';
+import { RoleEnum } from 'common/enums/rol.enum';
+import { CustomersService } from 'src/customers/customers.service';
+import { CreateCustomerDto } from 'src/customers/dto/create-customer.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
     private readonly userService: UsersService,
+    private readonly customerServic: CustomersService,
   ) {}
-  @UseGuards(LocalAuthGuard)
+  @Roles(RoleEnum.ADMIN)
   @Post('login')
   async loginUser(@Body() login: LoginUserDto) {
     return await this.authService.login(login);
   }
-  @Post('admin')
-  async registerAdmin(
+
+  @Post('registrar')
+  async registerUser(
     @Res() response,
     @Body(new ValidationPipe()) createUser: CreateUserDto,
   ) {
     try {
       const newUser = await this.userService.Register(createUser); // <- await
       return response.status(201).json({
-        message: 'Administrador creado correctamente',
+        message: 'Usuario creado correctamente',
         user: newUser.user,
       });
     } catch (error) {
@@ -55,17 +60,16 @@ export class AuthController {
       });
     }
   }
-
   @Post('registrar')
-  async registerUser(
+  async registerCustomer(
     @Res() response,
-    @Body(new ValidationPipe()) createUser: CreateUserDto,
+    @Body(new ValidationPipe()) createUser: CreateCustomerDto,
   ) {
     try {
-      const newUser = await this.userService.Register(createUser); // <- await
+      const newUser = await this.customerServic.register(createUser); // <- await
       return response.status(201).json({
         message: 'Usuario creado correctamente',
-        user: newUser.user,
+        user: newUser.customer.firstName,
       });
     } catch (error) {
       if (error instanceof ConflictException) {

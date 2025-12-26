@@ -42,7 +42,7 @@ export class RolesGuard implements CanActivate {
     return true;
   }
   //metodo  extraer  roles opcion
-  private extractRoleIds(roles: any[]): any[] {
+  private extractRoleIds(roles: any[]): RoleEnum[] {
     return roles.map((role) => {
       if (typeof role === 'object') {
         return role.roleid || role.id || role.name;

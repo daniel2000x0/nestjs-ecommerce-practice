@@ -1,15 +1,24 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { CustomersService } from './customers.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { Public } from 'src/auth/decorators/auth.decorator';
 
 @Controller('customers')
 export class CustomersController {
   constructor(private readonly customersService: CustomersService) {}
-
-  @Post()
+  @Public()
+  @Post('registrar')
   create(@Body() createCustomerDto: CreateCustomerDto) {
-    return this.customersService.create(createCustomerDto);
+    return this.customersService.register(createCustomerDto);
   }
 
   @Get()
@@ -23,7 +32,10 @@ export class CustomersController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCustomerDto: UpdateCustomerDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateCustomerDto: UpdateCustomerDto,
+  ) {
     return this.customersService.update(+id, updateCustomerDto);
   }
 

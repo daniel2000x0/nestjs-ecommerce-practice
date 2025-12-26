@@ -8,15 +8,20 @@ import {
   Delete,
   HttpStatus,
   HttpException,
+  UseGuards,
 } from '@nestjs/common';
 import { OrdersDetailsService } from './orders-details.service';
 import { CreateOrdersDetailDto } from './dto/create-orders-detail.dto';
 import { UpdateOrdersDetailDto } from './dto/update-orders-detail.dto';
-
+import { JwtAuthGuard } from 'src/auth/guards/auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { RoleEnum } from 'common/enums/rol.enum';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('orders-details')
 export class OrdersDetailsController {
   constructor(private readonly orderDetailsService: OrdersDetailsService) {}
-
+  @Roles(RoleEnum.CUSTOMER, RoleEnum.ADMIN)
   @Post('orderDetail')
   create(@Body() createOrderDetailDto: CreateOrdersDetailDto) {
     try {
@@ -36,7 +41,7 @@ export class OrdersDetailsController {
       );
     }
   }
-
+  @Roles(RoleEnum.CUSTOMER, RoleEnum.ADMIN)
   @Get('orderDetail')
   findAll() {
     try {
@@ -54,12 +59,12 @@ export class OrdersDetailsController {
       );
     }
   }
-
+  @Roles(RoleEnum.CUSTOMER, RoleEnum.ADMIN)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.orderDetailsService.findOne(+id);
   }
-
+  @Roles(RoleEnum.CUSTOMER, RoleEnum.ADMIN)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -68,6 +73,7 @@ export class OrdersDetailsController {
     return this.orderDetailsService.update(+id, updateOrderDetailDto);
   }
 
+  @Roles(RoleEnum.CUSTOMER, RoleEnum.ADMIN)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.orderDetailsService.remove(+id);

@@ -3,6 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
 import { AuthService } from '../auth.service';
 import { RolesService } from 'src/roles/roles.service'; // ✅ CAMBIO
+import { RoleEnum } from 'common/enums/rol.enum';
 
 @Injectable()
 export class LocalOAuthStrategy extends PassportStrategy(
@@ -46,14 +47,23 @@ export class LocalOAuthStrategy extends PassportStrategy(
 
       const user = await this.authService.validateUser(username, password);
 
-      // ✅ USO CORRECTO DEL SERVICIO REAL
-      const userRoles = await this.rolesService.findOne(user.userid);
-      const roles = userRoles.map((r) => r.roleid);
+      // 🔥 CAMBIO 1: usar id, NO userid
+      if (user.type === 'user') {
+        const userRoles = await this.rolesService.findOne(user.id);
+
+        // 🔥 CAMBIO 2: usar roleId (enum), no roleid
+        const roles: RoleEnum[] = userRoles.map((r) => r.roleId);
+        return {
+          ...user,
+          client_id,
+          roles,
+        };
+      }
 
       return {
         ...user,
         client_id,
-        roles,
+        roles: [RoleEnum.CUSTOMER],
       };
     } catch (error) {
       throw new UnauthorizedException(error.message || 'Authentication failed');

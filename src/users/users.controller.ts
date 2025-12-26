@@ -5,30 +5,37 @@ import {
   Patch,
   Param,
   UseGuards,
-  Res,
   Post,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesAddDto } from './dto/rolesadd.dto';
-
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { JwtAuthGuard } from 'src/auth/guards/auth.guard';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { RoleEnum } from 'common/enums/rol.enum';
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
-  @UseGuards(JwtGuard)
+  @Get()
+  @Roles(RoleEnum.ADMIN)
+  find() {
+    return this.usersService.findAll();
+  }
+  @Roles(RoleEnum.ADMIN)
   @Get(':email')
   findOne(@Param('email') email: string) {
     return this.usersService.findOne(email);
   }
-  @UseGuards(JwtGuard)
+  @Roles(RoleEnum.ADMIN)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
   }
-
+  @Roles(RoleEnum.ADMIN)
   @Post('rolesAsignados')
-  async assignRolesToUser(@Res() response, createUser: RolesAddDto) {
+  async assignRolesToUser(@Body() response, createUser: RolesAddDto) {
     try {
       const newUser = await this.usersService.roles(createUser); // <- await
       return response.status(201).json({

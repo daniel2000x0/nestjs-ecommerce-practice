@@ -13,11 +13,13 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { CustomerGuard } from 'src/auth/guards/customer.guard';
+import { JwtAuthGuard } from 'src/auth/guards/auth.guard';
 
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtAuthGuard, CustomerGuard)
   @Post()
   create(@Body() createOrderDto: CreateOrderDto) {
     return this.ordersService.regisorder(createOrderDto);

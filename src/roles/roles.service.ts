@@ -4,6 +4,8 @@ import { UpdateRoleDto } from './dto/update-role.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsersRole } from 'src/users-roles/entities/users-role.entity';
 import { DataSource, Repository } from 'typeorm';
+import { UserRole } from 'src/auth/interfaces/role-enum';
+import { RoleEnum } from 'common/enums/rol.enum';
 
 @Injectable()
 export class RolesService {
@@ -22,12 +24,16 @@ export class RolesService {
     return `This action returns all roles`;
   }
 
-  async findOne(id: number) {
-    const resultado = await this.datasource.query(
-      'select ur.roleid  from  users_roles ur   where ur.userid =  $1',
-      [id],
+  async findOne(userId: number): Promise<UserRole[]> {
+    const resultado: { roleid: number }[] = await this.datasource.query(
+      'SELECT ur.roleid FROM users_roles ur WHERE ur.userid = $1',
+      [userId],
     );
-    return resultado;
+
+    // mapear a UserRole
+    return resultado.map((r) => ({
+      roleId: r.roleid as RoleEnum, // convertir a enum
+    }));
   }
 
   update(id: number, updateRoleDto: UpdateRoleDto) {
