@@ -2,10 +2,7 @@ import {
   Body,
   ConflictException,
   Controller,
-  //Get,
-  HttpStatus,
   Post,
-  Res,
   UseGuards,
   ValidationPipe,
   Request,
@@ -13,7 +10,6 @@ import {
 import { LoginUserDto } from './dto/login.dto';
 import { AuthService } from './auth.service';
 import { UsersService } from 'src/users/users.service';
-import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { RefreshJwtGuard } from './guards/refresh-jwt-auth.guard';
 import { OAuthTokenDto } from './dto/oauth-token.dto';
 import { Roles } from './decorators/roles.decorator';
@@ -35,55 +31,28 @@ export class AuthController {
   }
 
   @Post('registrar')
-  async registerUser(
-    @Res() response,
-    @Body(new ValidationPipe()) createUser: CreateUserDto,
-  ) {
-    try {
-      const newUser = await this.userService.Register(createUser); // <- await
-      return response.status(201).json({
-        message: 'Usuario creado correctamente',
-        user: newUser.user,
-      });
-    } catch (error) {
-      if (error instanceof ConflictException) {
-        return response.status(HttpStatus.CONFLICT).json({
-          message: error.message,
-          statusCode: 409,
-        });
-      }
-
-      return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-        message: 'Error en el servidor',
-        error: error.message,
-        statusCode: 500,
-      });
-    }
-  }
-  @Post('registrar')
   async registerCustomer(
-    @Res() response,
     @Body(new ValidationPipe()) createUser: CreateCustomerDto,
   ) {
     try {
       const newUser = await this.customerServic.register(createUser); // <- await
-      return response.status(201).json({
+      return {
         message: 'Usuario creado correctamente',
         user: newUser.customer.firstName,
-      });
+      };
     } catch (error) {
       if (error instanceof ConflictException) {
-        return response.status(HttpStatus.CONFLICT).json({
+        return {
           message: error.message,
           statusCode: 409,
-        });
+        };
       }
 
-      return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      return {
         message: 'Error en el servidor',
         error: error.message,
         statusCode: 500,
-      });
+      };
     }
   }
 

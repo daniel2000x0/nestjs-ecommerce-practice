@@ -11,12 +11,9 @@ async function bootstrap() {
   // ⚡ Activar validación y transformación de DTOs
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
+      whitelist: true, // elimina propiedades que no estén en el DTO
+      forbidNonWhitelisted: true, // error si envían campos extra
       transform: true,
-      transformOptions: {
-        enableImplicitConversion: true,
-      },
     }),
   );
 

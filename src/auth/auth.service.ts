@@ -54,15 +54,7 @@ export class AuthService {
     }
     throw new HttpException('USER_INVALID', 403);
   }
-  async validateCustomer(username: string, password: string) {
-    const user = await this.customerService.findemail(username);
-    if (!user) throw new HttpException('USER_NOT_FOUND', 404);
-    const checkPassword = await compare(password, user.password);
-    if (!checkPassword) throw new HttpException('PASSWORD_INVALID', 403);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password: _, ...result } = user;
-    return result;
-  }
+
   private async issueTokens(entity: AuthEntity, client_id: string) {
     if (entity.type === 'user') {
       const userRoles = await this.rol_user.findOne(entity.id);
@@ -330,10 +322,6 @@ export class AuthService {
       secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
     });
   }
-
-  // =========================================================================
-  // 5. MÉTODOS PARA GUARDS Y ESTRATEGIAS
-  // =========================================================================
 
   async validateToken(token: string) {
     try {

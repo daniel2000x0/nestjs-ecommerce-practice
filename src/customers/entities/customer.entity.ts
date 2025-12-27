@@ -5,6 +5,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Generated,
   JoinColumn,
   ManyToOne,
   OneToMany,
@@ -14,7 +15,13 @@ import {
 export class Customer {
   @PrimaryGeneratedColumn()
   serial: number;
-  @Column({ type: 'int', default: 0 })
+
+  @Column({
+    name: 'customerid',
+    type: 'int',
+    unique: true,
+  })
+  @Generated('increment')
   customerid: number;
 
   @Column({ type: 'varchar', length: 100, name: 'customerfirstname' })

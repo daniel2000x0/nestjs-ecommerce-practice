@@ -1,4 +1,39 @@
+    async validateCustomer(username: string, password: string) {
+    const user = await this.customerService.findemail(username);
+    if (!user) throw new HttpException('USER_NOT_FOUND', 404);
+    const checkPassword = await compare(password, user.password);
+    if (!checkPassword) throw new HttpException('PASSWORD_INVALID', 403);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password: _, ...result } = user;
+    return result;
+  }
   
+  @Post('registrar')
+  async registerUser(
+    @Res() response,
+    @Body(new ValidationPipe()) createUser: CreateUserDto,
+  ) {
+    try {
+      const newUser = await this.userService.Register(createUser); // <- await
+      return response.status(201).json({
+        message: 'Usuario creado correctamente',
+        user: newUser.user,
+      });
+    } catch (error) {
+      if (error instanceof ConflictException) {
+        return response.status(HttpStatus.CONFLICT).json({
+          message: error.message,
+          statusCode: 409,
+        });
+      }
+
+      return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message: 'Error en el servidor',
+        error: error.message,
+        statusCode: 500,
+      });
+    }
+  }
   private createOAuthPayload(user: any, roles: any[], client_id: string) {
     return {
       sub: user.userid, // OAuth2 estándar

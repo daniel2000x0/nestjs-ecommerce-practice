@@ -70,6 +70,7 @@ export class CustomersService {
   async findemail(custommeremail: string): Promise<Customer> {
     const customer = await this.customerRepository.findOne({
       where: { email: custommeremail },
+      select: ['serial', 'customerid', 'email', 'password'],
     });
     if (!customer) {
       throw new NotFoundException('NO  se an encontrado   ususrio ');

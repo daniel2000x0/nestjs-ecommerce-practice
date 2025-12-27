@@ -1,4 +1,3 @@
-import { IsNotEmpty, isNotEmpty } from 'class-validator';
 import { Country } from 'src/countries/entities/country.entity';
 import { Customer } from 'src/customers/entities/customer.entity';
 import { OrdersDetail } from 'src/orders-details/entities/orders-detail.entity';
@@ -17,7 +16,6 @@ import {
 export class Order {
   @PrimaryGeneratedColumn()
   serial: number;
-  
 
   @Column({ type: 'int', generated: 'increment', unique: true })
   orderid: number;
